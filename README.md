@@ -1,16 +1,51 @@
-# React + Vite
+# ✦ PROJECT: ANIVERSE VAULT 
+An ultra-dark, high-end e-commerce platform blending designer luxury aesthetics with premium anime intellectual property. 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Built with React, this project focuses on minimalist compositions, high-contrast lighting, and a stark monochromatic UI heavily accented by deep blacks and dark reds.
 
-Currently, two official plugins are available:
+## 📱 Live Preview 
+*(Insert link to your live site here once deployed)*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 👁️ Visual Architecture
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### The Hero Interface
+Features an auto-rotating cinematic slider, high-contrast typography, and a custom-built Flash Drop countdown timer widget with a translucent glass-morphism effect.
 
-## Expanding the ESLint configuration
+![Hero Section and Timer](./screenshots/hero-section.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### The Editorial Spotlight
+A 50/50 asymmetrical split-screen designed to highlight flagship items. Forces the user to pause and appreciate the craftsmanship of high-ticket inventory through premium storytelling and layout.
+
+![Editorial Spotlight Layout](./screenshots/editorial-spotlight.png)
+
+### The Curated Archive
+A fully responsive, grid-based product catalog. Features dynamic hover states, luxury pill-shaped action buttons, and striking image filters to maintain the dark editorial tone across all merchandise.
+
+![Product Archive Grid](./screenshots/product-archive.png)
+
+---
+
+## 🛠️ Technical Stack
+* **Framework:** React.js
+* **Styling:** Custom CSS (Focus on high-contrast luxury, matte black backgrounds, and fluid transitions)
+* **Architecture:** Component-based modular design
+
+## ⚙️ Installation & Setup
+To run this project locally:
+
+1. Clone the repository
+\`\`\`bash
+git clone https://github.com/Rockhalt/Website-Aniverse.git
+\`\`\`
+
+2. Install dependencies
+\`\`\`bash
+npm install
+\`\`\`
+
+3. Launch the development server
+\`\`\`bash
+npm run dev
+\`\`\`
