@@ -25,29 +25,16 @@ A 50/50 asymmetrical split-screen designed to highlight flagship items. Forces t
 A fully responsive, grid-based product catalog. Features dynamic hover states, luxury pill-shaped action buttons, and striking image filters to maintain the dark editorial tone across all merchandise.
 
 <img width="1897" height="911" alt="Screenshot 2026-06-05 142130" src="https://github.com/user-attachments/assets/4b62b926-0a39-4e21-965e-5d804baaa210" />
+<img width="1899" height="910" alt="Screenshot 2026-06-05 185021" src="https://github.com/user-attachments/assets/81c31161-3e3c-43c2-bcf9-83f579469a08" />
+<img width="1898" height="908" alt="Screenshot 2026-06-05 185054" src="https://github.com/user-attachments/assets/685e4ea8-72a0-4d17-b44f-091c4f80f9da" />
 
 
----
+### The Global Footer
+A minimalist, multi-column footer anchoring the user experience. It features essential brand navigation, a newsletter subscription capture with sleek input focus states, and seamless social integrations, all set against a deep matte black canvas to complete the immersive aesthetic.
 
-## 🛠️ Technical Stack
-* **Framework:** React.js
-* **Styling:** Custom CSS (Focus on high-contrast luxury, matte black backgrounds, and fluid transitions)
-* **Architecture:** Component-based modular design
+<img width="1899" height="402" alt="Screenshot 2026-06-05 185110" src="https://github.com/user-attachments/assets/2e165bcc-f352-4366-93b2-bfbfbbe27248" />
+<img width="1897" height="908" alt="Screenshot 2026-06-05 185528" src="https://github.com/user-attachments/assets/688b22ae-e818-4d9b-8bb0-c68ac8cb0ee6" />
 
-## ⚙️ Installation & Setup
-To run this project locally:
 
-1. Clone the repository
-\`\`\`bash
-git clone https://github.com/Rockhalt/Website-Aniverse.git
-\`\`\`
 
-2. Install dependencies
-\`\`\`bash
-npm install
-\`\`\`
 
-3. Launch the development server
-\`\`\`bash
-npm run dev
-\`\`\`
