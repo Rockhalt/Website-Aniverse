@@ -4,7 +4,7 @@ An ultra-dark, high-end e-commerce platform blending designer luxury aesthetics 
 Built with React, this project focuses on minimalist compositions, high-contrast lighting, and a stark monochromatic UI heavily accented by deep blacks and dark reds.
 
 ## 📱 Live Preview 
-(https://rockhalt.github.io/Website-Aniverse/)
+https://rockhalt.github.io/Website-Aniverse/
 
 ---
 
