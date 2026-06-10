@@ -167,7 +167,7 @@ export function Navbar() {
             <li><a href="#figures" className="nav-link">FIGURES</a></li>
             <li><a href="#accessories" className="nav-link">ACCESSORIES</a></li>
             <li><a href="#katana" className="nav-link">KATANA</a></li>
-            <li><a href="#t-shirt" className="nav-link">T-SHIRT</a></li>
+            <li><a href="#clothes" className="nav-link">CLOTHES</a></li>
           </ul>
         </div>
 
