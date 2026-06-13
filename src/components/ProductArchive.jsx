@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import './ProductArchive.css';
+import { addProductToDatabase, getProductsFromDatabase } from './supabaseService';
 
-// Expanded catalog with 12 premium items and stable image seeds
+// Expanded catalog with 12 premium items
 const products = [
   {
     id: 1,
@@ -178,312 +180,91 @@ const products = [
 ];
 
 export function ProductArchive() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // UPDATED STATE: Added "tag" to handle the dropdown menu selection
+  const [newProduct, setNewProduct] = useState({ 
+    title: '', brand: '', category: '', price: '', image: '', originalPrice: '', discount: '', stockCount: '', tag: 'NONE' 
+  });
+  
+  const [inventory, setInventory] = useState(products);
+
+  useEffect(() => {
+    async function loadVault() {
+      try {
+        const cloudData = await getProductsFromDatabase();
+        if (cloudData && cloudData.length > 0) {
+          setInventory([...cloudData, ...products]); 
+        }
+      } catch (error) {
+        console.error("Failed to load initial data:", error);
+      }
+    }
+    loadVault();
+  }, []);
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    
+    const parsedStock = newProduct.stockCount ? parseInt(newProduct.stockCount) : null;
+    const isLowStock = parsedStock !== null && parsedStock > 0 && parsedStock <= 5;
+
+    // Format the tag as an array for Supabase (if "NONE" is selected, send an empty array)
+    const productTags = newProduct.tag !== 'NONE' ? [newProduct.tag] : [];
+
+    const newItem = {
+      id: Date.now(), 
+      title: newProduct.title,
+      brand: newProduct.brand,
+      category: newProduct.category,
+      price: `$${newProduct.price}`, 
+      originalPrice: newProduct.originalPrice ? `$${newProduct.originalPrice}` : null,
+      discount: newProduct.discount ? newProduct.discount : null,
+      image: newProduct.image,
+      rating: 5.0, 
+      reviews: Math.floor(Math.random() * 150) + 12, 
+      lowStock: isLowStock,
+      stockCount: parsedStock,
+      tags: productTags // NEW: Sends the selected tag to the database
+    };
+
+    try {
+      await addProductToDatabase(newItem);
+      setInventory([newItem, ...inventory]);
+      setIsModalOpen(false);
+      
+      // Wipe the form completely clean
+      setNewProduct({ 
+        title: '', brand: '', category: '', price: '', image: '', originalPrice: '', discount: '', stockCount: '', tag: 'NONE' 
+      });
+
+    } catch (error) {
+      console.error("Vault Error:", error);
+      alert("Error: Could not connect to the Supabase Vault.");
+    }
+  };
+
   return (
     <>
-      <style>{`
-        .archive-section {
-          background-color: #070707; 
-          color: #ffffff;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          padding: 4rem 3rem;
-          min-height: 100vh;
-        }
-
-        /* --- HEADER STYLES --- */
-        .archive-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          margin-bottom: 2.5rem;
-          padding-bottom: 1.5rem;
-          border-bottom: 1px solid #1a1a1a;
-        }
-
-        .header-left .title {
-          font-family: Impact, 'Arial Black', sans-serif;
-          font-size: 2rem;
-          letter-spacing: 1px;
-          margin: 0 0 0.5rem 0;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .header-left .title-icon {
-          color: #dc2626; 
-        }
-
-        .header-left .subtitle {
-          color: #737373;
-          font-family: monospace;
-          font-size: 0.8rem;
-          letter-spacing: 2px;
-          margin: 0;
-          text-transform: uppercase;
-        }
-
-        .header-controls {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .control-btn {
-          background: transparent;
-          border: 1px solid #2a2a2a;
-          color: #a3a3a3;
-          padding: 0.6rem 1.5rem;
-          border-radius: 99px; 
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 1px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          transition: all 0.2s ease;
-        }
-
-        .control-btn:hover {
-          border-color: #dc2626;
-          color: #ffffff;
-        }
-
-        /* --- GRID STYLES --- */
-        .product-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 1.5rem;
-        }
-
-        /* --- CARD STYLES --- */
-        .card {
-          background-color: #0f0f0f; 
-          border: 1px solid #1a1a1a;
-          border-radius: 8px;
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-          transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:hover {
-          transform: translateY(-4px);
-          border-color: #333;
-        }
-
-        .card-image-wrapper {
-          position: relative;
-          aspect-ratio: 4/3;
-          background-color: #000000;
-          overflow: hidden;
-        }
-
-        .card-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          filter: grayscale(40%) brightness(0.65) contrast(1.2) sepia(10%) hue-rotate(-10deg);
-          transition: all 0.5s ease;
-        }
-
-        .card:hover .card-image {
-          filter: grayscale(0%) brightness(0.85) contrast(1.1);
-          transform: scale(1.05);
-        }
-
-        /* Overlays (Tags & Favorite) */
-        .tags-container {
-          position: absolute;
-          top: 1rem;
-          left: 1rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-          z-index: 2;
-        }
-
-        .tag {
-          font-size: 0.65rem;
-          font-weight: 700;
-          padding: 0.3rem 0.6rem;
-          border-radius: 2px;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-
-        .tag-discount {
-          background-color: #dc2626; 
-          color: #ffffff;
-        }
-
-        .tag-dark {
-          background-color: rgba(0, 0, 0, 0.8);
-          color: #d1d1d1;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tag-warning {
-          background-color: transparent;
-          color: #fb923c;
-          font-family: monospace;
-          padding: 0;
-          margin-top: 0.2rem;
-        }
-
-        .fav-btn {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          background: rgba(0, 0, 0, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #a3a3a3;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          backdrop-filter: blur(4px);
-          transition: all 0.2s;
-          z-index: 2;
-        }
-
-        .fav-btn:hover {
-          color: #dc2626;
-          border-color: #dc2626;
-        }
-
-        /* --- CARD CONTENT --- */
-        .card-content {
-          padding: 1.5rem 1.2rem;
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-        }
-
-        .card-meta {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.65rem;
-          font-weight: 700;
-          letter-spacing: 1px;
-          margin-bottom: 0.8rem;
-          text-transform: uppercase;
-        }
-
-        .meta-brand { color: #dc2626; } 
-        .meta-category { color: #525252; }
-
-        .card-title {
-          font-size: 1.1rem;
-          font-weight: 600;
-          line-height: 1.4;
-          margin: 0 0 0.8rem 0;
-          color: #f5f5f5;
-        }
-
-        .card-rating {
-          display: flex;
-          align-items: center;
-          gap: 0.3rem;
-          margin-bottom: 2rem;
-        }
-
-        .stars {
-          color: #f59e0b; 
-          font-size: 0.8rem;
-          letter-spacing: 1px;
-        }
-
-        .review-count {
-          color: #525252;
-          font-size: 0.75rem;
-        }
-
-        /* --- CARD FOOTER --- */
-        .card-footer {
-          margin-top: auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center; 
-        }
-
-        .price-container {
-          display: flex;
-          flex-direction: column;
-          gap: 0.2rem;
-        }
-
-        .price-original {
-          color: #525252;
-          font-size: 0.75rem;
-          text-decoration: line-through;
-          height: 12px;
-        }
-
-        .price-current {
-          color: #ffffff;
-          font-size: 1.2rem;
-          font-weight: 700;
-        }
-
-        /* HIGH-END PILL BUTTON DESIGN */
-        .buy-now {
-          background-color: rgba(255, 255, 255, 0.04);
-          border: 1px solid #2a2a2a;
-          color: #ffffff;
-          font-size: 0.75rem;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.6rem 1.4rem;
-          border-radius: 99px; 
-        }
-
-        /* Interactive smooth filling transition */
-        .card:hover .buy-now {
-          background-color: #ffffff;
-          color: #000000;
-          border-color: #ffffff;
-          box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-        }
-
-        .buy-now svg {
-          transition: transform 0.3s ease;
-        }
-
-        .card:hover .buy-now svg {
-          transform: translateX(2px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          .archive-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1.5rem;
-          }
-          .archive-section { padding: 2rem 1.5rem; }
-        }
-      `}</style>
-
       <section className="archive-section">
         
-        {/* Header Area */}
         <header className="archive-header">
           <div className="header-left">
             <h2 className="title">
               <span className="title-icon">✦</span> CURATED GEAR ARCHIVE
             </h2>
-            <p className="subtitle">{products.length} ITEMS FOUND</p>
+            <p className="subtitle">{inventory.length} ITEMS FOUND</p> 
           </div>
           
           <div className="header-controls">
+            <button className="admin-add-btn" onClick={() => setIsModalOpen(true)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              ADD PRODUCT
+            </button>
+
             <button className="control-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-8h6m2 10h6"/></svg>
               METRICS / FILTERS
@@ -495,16 +276,14 @@ export function ProductArchive() {
           </div>
         </header>
 
-        {/* Product Grid */}
         <div className="product-grid">
-          {products.map(product => (
+          {inventory.map(product => (
             <article key={product.id} className="card">
               
-              {/* Image & Overlays */}
               <div className="card-image-wrapper">
                 <div className="tags-container">
                   {product.discount && <span className="tag tag-discount">{product.discount}</span>}
-                  {product.tags.map(tag => (
+                  {(product.tags || []).map(tag => (
                     <span key={tag} className="tag tag-dark">{tag}</span>
                   ))}
                   {product.lowStock && (
@@ -519,7 +298,6 @@ export function ProductArchive() {
                 <img src={product.image} alt={product.title} className="card-image" loading="lazy" />
               </div>
 
-              {/* Text Content */}
               <div className="card-content">
                 <div className="card-meta">
                   <span className="meta-brand">{product.brand}</span>
@@ -539,7 +317,6 @@ export function ProductArchive() {
                     <span className="price-current">{product.price}</span>
                   </div>
                   
-                  {/* Clean, Consistent E-commerce Pill Button */}
                   <button className="buy-now">
                     BUY NOW
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -554,8 +331,79 @@ export function ProductArchive() {
             </article>
           ))}
         </div>
-
       </section>
+
+      {/* --- ADMIN UPLOAD MODAL --- */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>✦ ADD NEW GEAR</h3>
+              <button className="close-btn" onClick={() => setIsModalOpen(false)}>✕</button>
+            </div>
+            
+            <form onSubmit={handleAddProduct} className="admin-form">
+              <input 
+                type="text" placeholder="Product Title (e.g., Hollow Mask)" required
+                value={newProduct.title} onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
+              />
+              <div className="form-row">
+                <input 
+                  type="text" placeholder="Brand" required
+                  value={newProduct.brand} onChange={(e) => setNewProduct({...newProduct, brand: e.target.value})}
+                />
+                <input 
+                  type="text" placeholder="Category" required
+                  value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                />
+              </div>
+              
+              <div className="form-row">
+                <input 
+                  type="number" placeholder="Current Price (USD)" required
+                  value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                />
+                <input 
+                  type="number" placeholder="Original Price (Optional)" 
+                  value={newProduct.originalPrice} onChange={(e) => setNewProduct({...newProduct, originalPrice: e.target.value})}
+                />
+              </div>
+
+              <div className="form-row">
+                <input 
+                  type="text" placeholder="Discount Text (e.g., -20% OFF)" 
+                  value={newProduct.discount} onChange={(e) => setNewProduct({...newProduct, discount: e.target.value})}
+                />
+                <input 
+                  type="number" placeholder="Stock Count (Optional)" 
+                  value={newProduct.stockCount} onChange={(e) => setNewProduct({...newProduct, stockCount: e.target.value})}
+                />
+              </div>
+
+              {/* NEW ROW: Feature Tag Dropdown and Image URL */}
+              <div className="form-row">
+                <select 
+                  value={newProduct.tag} 
+                  onChange={(e) => setNewProduct({...newProduct, tag: e.target.value})}
+                  style={{ padding: '0.8rem', backgroundColor: '#111', color: '#fff', border: '1px solid #333', textTransform: 'uppercase' }}
+                >
+                  <option value="NONE">-- NO HIGHLIGHT TAG --</option>
+                  <option value="NEW ARRIVAL">NEW ARRIVAL</option>
+                  <option value="BEST SELLER">BEST SELLER</option>
+                  <option value="LIMITED RUN">LIMITED RUN</option>
+                  <option value="VAULT EXCLUSIVE">VAULT EXCLUSIVE</option>
+                </select>
+                <input 
+                  type="text" placeholder="Image URL (e.g., images/mask.jpg)" required
+                  value={newProduct.image} onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                />
+              </div>
+              
+              <button type="submit" className="submit-btn">AUTHORIZE UPLOAD</button>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
