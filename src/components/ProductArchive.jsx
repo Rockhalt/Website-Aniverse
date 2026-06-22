@@ -1,6 +1,10 @@
+import { CartSlider } from './CartSlider';
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './ProductArchive.css';
 import { addProductToDatabase, getProductsFromDatabase } from './supabaseService';
+import { useCart } from '../CartContext';
+
 
 // Expanded catalog with 12 premium items
 const products = [
@@ -180,7 +184,11 @@ const products = [
 ];
 
 export function ProductArchive() {
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   
   // UPDATED STATE: Added "tag" to handle the dropdown menu selection
   const [newProduct, setNewProduct] = useState({ 
@@ -244,9 +252,21 @@ export function ProductArchive() {
     }
   };
 
+  const handleAddToCart = (product) => {
+  addToCart(product); // Add the item to the global cart
+  setShowPopup(true); // Show the popup
+  
+  // Automatically hide the popup after 2.5 seconds
+  setTimeout(() => {
+    setShowPopup(false);
+  }, 2500); 
+};
+
   return (
     <>
       <section className="archive-section">
+        
+        {/* ... (Your header and product grid stay exactly the same) ... */}
         
         <header className="archive-header">
           <div className="header-left">
@@ -265,7 +285,7 @@ export function ProductArchive() {
               ADD PRODUCT
             </button>
 
-            <button className="control-btn">
+            <button className="control-btn" onClick={() => navigate('/metrics')}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-8h6m2 10h6"/></svg>
               METRICS / FILTERS
             </button>
@@ -317,14 +337,14 @@ export function ProductArchive() {
                     <span className="price-current">{product.price}</span>
                   </div>
                   
-                  <button className="buy-now">
-                    BUY NOW
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                      <line x1="3" y1="6" x2="21" y2="6"></line>
-                      <path d="M16 10a4 4 0 0 1-8 0"></path>
-                    </svg>
-                  </button>
+                  <button className="buy-now" onClick={() => handleAddToCart(product)}>
+                  ADD TO CART
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                </button>
                 </div>
               </div>
 
@@ -404,6 +424,17 @@ export function ProductArchive() {
           </div>
         </div>
       )}
+
+      {/* ✦ THE POPUP IS NOW SAFELY INSIDE THE RETURN BLOCK ✦ */}
+      {showPopup && (
+        <div className="premium-cart-popup">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
+          GEAR SECURED IN CART
+        </div>
+      )}
+
     </>
   );
 }

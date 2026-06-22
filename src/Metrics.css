@@ -1,0 +1,155 @@
+/* Metrics.css */
+.metrics-container {
+  min-height: 100vh;
+  background-color: #050505;
+  color: #f4f4f4;
+  /* CHANGED: 8rem top, 2rem right, 4rem bottom, 2rem left */
+  padding: 8rem 2rem 4rem 2rem; 
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.metrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+  border-bottom: 1px solid #222;
+  padding-bottom: 1.5rem;
+}
+
+.metrics-header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 0.1em;
+  font-weight: 300;
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.metrics-header .subtitle {
+  color: #888;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Premium Card Styling */
+.metric-card {
+  background-color: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  padding: 2rem;
+  transition: border-color 0.3s ease;
+}
+
+.metric-card:hover {
+  border-color: #333;
+}
+
+.metric-card.wide {
+  grid-column: span 2;
+}
+
+.metric-label {
+  color: #666;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.metric-trend {
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+.trend-up {
+  color: #4caf50; /* Subtle green for positive */
+}
+
+.trend-down {
+  color: #8b0000; /* Dark red for negative/alerts */
+}
+
+/* Top Performers List */
+.performers-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0 0;
+}
+
+.performer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #111;
+}
+
+.performer-item:last-child {
+  border-bottom: none;
+}
+
+.performer-name {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.performer-stat {
+  font-family: monospace;
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* Return Button */
+.btn-return-metrics {
+  background: none;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.btn-return-metrics:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .metric-card.wide {
+    grid-column: span 1;
+  }
+  .metrics-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}

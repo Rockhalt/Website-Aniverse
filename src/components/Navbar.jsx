@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useCart } from '../CartContext'; // Adjust the ../ if necessary based on your folders
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { cart, setIsCartOpen } = useCart();
 
   // Trigger the blur effect when scrolling down
   useEffect(() => {
@@ -118,23 +120,35 @@ export function Navbar() {
         }
 
         /* E-commerce Cart Badge */
+          .navbar-cart-btn {
+          background: none;
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          position: relative; /* Crucial for the badge positioning */
+          padding: 0.5rem;
+          transition: color 0.3s ease;
+        }
+
+        .navbar-cart-btn:hover {
+          color: #888;
+        }
+
         .cart-badge {
           position: absolute;
-          top: -8px;
-          right: -10px;
-          background-color: #ff4500;
-          color: #ffffff;
+          top: 0px;
+          right: -5px;
+          background-color: #ff4500; /* Dark luxury red */
+          color: white;
           font-size: 0.7rem;
-          font-weight: 700;
+          font-weight: bold;
           height: 18px;
-          min-width: 18px;
-          border-radius: 50%;
+          width: 18px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid #070707; /* Matches the deep black background */
+          border-radius: 50%; /* Perfect circle */
         }
-
         /* Scrolled state border color adjustment for badge */
         .aniverse-nav.scrolled .cart-badge {
           border-color: transparent; 
@@ -187,14 +201,18 @@ export function Navbar() {
             </svg>
           </button>
 
-          <button className="icon-btn" aria-label="Cart">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
-            <span className="cart-badge">2</span>
-          </button>
+            <button className="navbar-cart-btn" onClick={() => setIsCartOpen(true)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          
+          {/* Only show the red number badge if there is actually gear in the cart! */}
+          {cart.length > 0 && (
+            <span className="cart-badge">{cart.length}</span>
+          )}
+        </button>
         </div>
 
       </nav>

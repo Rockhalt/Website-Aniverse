@@ -348,3 +348,27 @@
   .archive-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
   .archive-section { padding: 2rem 1.5rem; }
 }
+
+.premium-cart-popup {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #fff;
+  color: #000;
+  padding: 1rem 2rem;
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 10000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
