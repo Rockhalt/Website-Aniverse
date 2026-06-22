@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
-  base: '/Website-Aniverse/',
   plugins: [react()],
+  base: '/', // <-- Change this to just a single slash for Vercel!
 })
