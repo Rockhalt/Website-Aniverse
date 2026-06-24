@@ -70,7 +70,7 @@ function App() {
           session ? (
             <>
               <HeroSlider />
-              
+              <EditorialSpotlight/>
               <ProductArchive />
               
             </>
