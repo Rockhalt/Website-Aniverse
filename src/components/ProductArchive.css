@@ -4,6 +4,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   padding: 4rem 3rem;
   min-height: 100vh;
+  padding-top: 120px;
 }
 
 /* --- HEADER STYLES --- */
@@ -113,6 +114,10 @@
   aspect-ratio: 4/3;
   background-color: #000000;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Keep whatever other styling you already have in here */
 }
 
 .card-image {

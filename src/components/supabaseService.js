@@ -1,21 +1,23 @@
-const SUPABASE_URL = 'https://ykepqxdishygirotpjab.supabase.co'; // e.g., https://xyz.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZXBxeGRpc2h5Z2lyb3RwamFiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTE4NDk4MiwiZXhwIjoyMDk2NzYwOTgyfQ.mobJ29q6rwCFcHCH1xEi2hdTb_NnKe1VW7N1Et-jq1g'; // The long eyJ... string
+import { createClient } from '@supabase/supabase-js';
+
+// 1. PASTE YOUR KEYS HERE
+export const SUPABASE_URL = 'https://ykepqxdishygirotpjab.supabase.co'; // e.g., https://xyz.supabase.co
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZXBxeGRpc2h5Z2lyb3RwamFiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTE4NDk4MiwiZXhwIjoyMDk2NzYwOTgyfQ.mobJ29q6rwCFcHCH1xEi2hdTb_NnKe1VW7N1Et-jq1g'; // The long eyJ... string
+
+// ✦ 2. THIS IS THE LINE THAT FIXES YOUR LOGIN ERROR ✦
+// It creates the official client and shares it with Signup.jsx and Login.jsx
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /**
  * Sends a new product to the Supabase Vault
  */
 export async function addProductToDatabase(newItem) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-    },
-    body: JSON.stringify(newItem)
-  });
+  const { data, error } = await supabase
+    .from('products')
+    .insert([newItem]);
 
-  if (!response.ok) {
+  if (error) {
+    console.error("Upload Error:", error);
     throw new Error('Failed to save to Supabase');
   }
   
@@ -26,19 +28,15 @@ export async function addProductToDatabase(newItem) {
  * Fetches all products from the Supabase Vault
  */
 export async function getProductsFromDatabase() {
-  // We add ?select=* to tell Supabase we want all columns
-  // We add &order=id.desc to put the newest items at the top!
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=id.desc`, {
-    method: 'GET',
-    headers: { 
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-    }
-  });
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('id', { ascending: false }); // Puts newest items at the top
 
-  if (!response.ok) {
+  if (error) {
+    console.error("Fetch Error:", error);
     throw new Error('Failed to fetch from Supabase');
   }
   
-  return await response.json(); // Hands the data back to React
+  return data; // Hands the data back to React
 }

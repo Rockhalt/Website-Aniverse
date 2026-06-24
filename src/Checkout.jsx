@@ -1,23 +1,23 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from './CartContext'; // Tapping into the global backpack!
 import './Checkout.css'; 
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const location = useLocation();
+  
+  // 1. GRAB THE GLOBAL CART AND MATH FUNCTION
+  const { cart, getCartTotal } = useCart();
 
-  // 1. CATCH THE INCOMING DATA
-  const product = location.state?.product;
-
-  // 2. DYNAMIC MATH (Fallback to 0 if they refresh the page directly)
-  const itemPrice = product ? parseFloat(product.price.replace('$', '').replace(',', '')) : 0;
-  const shippingFee = product ? 15.00 : 0;
-  const grandTotal = (itemPrice + shippingFee).toFixed(2);
+  // 2. DYNAMIC MATH BASED ON THE WHOLE CART
+  const subtotal = getCartTotal();
+  const shippingFee = cart.length > 0 ? 15.00 : 0; // Only charge shipping if cart has items
+  const grandTotal = (subtotal + shippingFee).toFixed(2);
 
   const handleCheckout = (e) => {
     e.preventDefault();
-    if (!product) return alert("Your cart is empty.");
-    alert(`AUTHORIZATION ACCEPTED. Your ${product.title} is being prepped for transport.`);
+    if (cart.length === 0) return alert("Transmission failed. Cart is empty.");
+    alert(`AUTHORIZATION ACCEPTED. Your ${cart.length} items are being prepped for transport.`);
     navigate('/'); 
   };
 
@@ -73,7 +73,7 @@ export default function Checkout() {
               </div>
             </div>
 
-            <button type="submit" className="btn-submit">
+            <button type="submit" className="btn-submit" disabled={cart.length === 0}>
               AUTHORIZE ${grandTotal}
             </button>
           </form>
@@ -81,26 +81,30 @@ export default function Checkout() {
 
         {/* RIGHT COLUMN: Dynamic Order Summary */}
         <div className="order-summary">
-          <h2>ORDER SUMMARY</h2>
+          <h2>ORDER SUMMARY ({cart.length})</h2>
           
-          {product ? (
-            <div className="summary-item">
-              <div className="item-info">
-                <h4>{product.title}</h4>
-                <p>{product.brand} / {product.category}</p>
+          <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '1rem', paddingRight: '1rem' }}>
+            {cart.length > 0 ? (
+              cart.map((item, index) => (
+                <div key={index} className="summary-item">
+                  <div className="item-info">
+                    <h4>{item.title}</h4>
+                    <p>{item.brand} / {item.category}</p>
+                  </div>
+                  <span className="item-price">{item.price}</span>
+                </div>
+              ))
+            ) : (
+              <div className="summary-item">
+                <p style={{ color: '#888' }}>No transmission detected. Cart is empty.</p>
               </div>
-              <span className="item-price">{product.price}</span>
-            </div>
-          ) : (
-            <div className="summary-item">
-              <p style={{ color: '#888' }}>No transmission detected. Cart is empty.</p>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="summary-totals">
             <div className="total-row">
               <span>Subtotal</span>
-              <span>${itemPrice.toFixed(2)}</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
             <div className="total-row">
               <span>Encrypted Shipping</span>

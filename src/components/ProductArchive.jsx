@@ -1,196 +1,22 @@
-import { CartSlider } from './CartSlider';
-import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CartSlider } from './CartSlider';
 import './ProductArchive.css';
 import { addProductToDatabase, getProductsFromDatabase } from './supabaseService';
 import { useCart } from '../CartContext';
-
-
-// Expanded catalog with 12 premium items
-const products = [
-  {
-    id: 1,
-    brand: "AKATSUKI SYNDICATE",
-    category: "STREETWEAR",
-    title: "Heavyweight Cloud Cloak Hoodie (Matte Black)",
-    rating: 4.8,
-    reviews: 124,
-    originalPrice: "$129.99",
-    price: "$89.99",
-    discount: "-30% OFF",
-    tags: ["BEST SELLER", "LIMITED RUN"],
-    lowStock: false,
-    image: "images/Akatsuki.jpg"
-  },
-  {
-    id: 2,
-    brand: "ANBU OPS",
-    category: "PROP REPLICA",
-    title: "Porcelain Shadow Mask - Itachi Edition",
-    rating: 4.9,
-    reviews: 88,
-    originalPrice: null,
-    price: "$145.00",
-    discount: null,
-    tags: ["HANDCRAFTED", "MATTE FINISH"],
-    lowStock: true,
-    stockCount: 3,
-    image: "images/Anbu.webp"
-  },
-  {
-    id: 3,
-    brand: "UCHIHA ARCHIVES",
-    category: "ACCESSORIES",
-    title: "Mangekyou Sharingan Obsidian Signet Ring",
-    rating: 5.0,
-    reviews: 42,
-    originalPrice: "$85.00",
-    price: "$64.99",
-    discount: "-24% OFF",
-    tags: ["ARTISAN", "TITANIUM"],
-    lowStock: false,
-    image: "images/Sharingan.webp"
-  },
-  {
-    id: 4,
-    brand: "GHOST OF UCHIHA",
-    category: "WEAPONS",
-    title: "Madara's Gunbai War Fan (1:1 Scale Metal)",
-    rating: 4.7,
-    reviews: 31,
-    originalPrice: "$399.99",
-    price: "$299.99",
-    discount: "-25% OFF",
-    tags: ["COLLECTOR'S TIER", "HEAVYWEIGHT"],
-    lowStock: false,
-    image: "images/Gunbai.jpeg"
-  },
-  {
-    id: 5,
-    brand: "HIDDEN LEAF ELITE",
-    category: "COLLECTIBLE",
-    title: "Minato's Hiraishin Kunai (24k Gold Plated Edition)",
-    rating: 5.0,
-    reviews: 156,
-    originalPrice: "$220.00",
-    price: "$180.00",
-    discount: "-18% OFF",
-    tags: ["PREMIUM TIER", "VAULT EXCLUSIVE"],
-    lowStock: true,
-    stockCount: 2,
-    image: "images/Kunai.jpg"
-  },
-  {
-    id: 6,
-    brand: "CURSED ARCHIVES",
-    category: "PROP REPLICA",
-    title: "Ryomen Sukuna Cursed Finger (Resin Cast)",
-    rating: 4.6,
-    reviews: 95,
-    originalPrice: "$60.00",
-    price: "$45.00",
-    discount: "-25% OFF",
-    tags: ["BEST SELLER"],
-    lowStock: false,
-    image: "images/Sukuna.webp"
-  },
-  {
-    id: 7,
-    brand: "ESPADA SYNDICATE",
-    category: "APPAREL",
-    title: "Las Noches Heavyweight Bomber (Charcoal)",
-    rating: 4.8,
-    reviews: 67,
-    originalPrice: null,
-    price: "$110.00",
-    discount: null,
-    tags: ["NEW ARRIVAL"],
-    lowStock: false,
-    image: "images/Fortress.jpg"
-  },
-  {
-    id: 8,
-    brand: "HASHIRA FORGE",
-    category: "KATANA",
-    title: "Sun Breathing Nichirin (Matte Black Carbon)",
-    rating: 4.9,
-    reviews: 210,
-    originalPrice: "$299.99",
-    price: "$250.00",
-    discount: "-16% OFF",
-    tags: ["ARTISAN", "1:1 SCALE"],
-    lowStock: true,
-    stockCount: 4,
-    image: "images/Sword.webp"
-  },
-  {
-    id: 9,
-    brand: "PARADIS COMMAND",
-    category: "JEWELRY",
-    title: "Wings of Freedom Titanium Pendant",
-    rating: 4.7,
-    reviews: 184,
-    originalPrice: "$75.00",
-    price: "$55.00",
-    discount: "-26% OFF",
-    tags: ["BEST SELLER"],
-    lowStock: false,
-    image: "images/Wings.png"
-  },
-  {
-    id: 10,
-    brand: "METEOR CITY",
-    category: "ACCESSORIES",
-    title: "Phantom Troupe Artisan Keycap Set",
-    rating: 4.9,
-    reviews: 53,
-    originalPrice: null,
-    price: "$85.00",
-    discount: null,
-    tags: ["LIMITED EDITION", "CHERRY MX"],
-    lowStock: false,
-    image: "images/Keys.jpg"
-  },
-  {
-    id: 11,
-    brand: "STATE ALCHEMIST",
-    category: "ACCESSORIES",
-    title: "Flamel Transmutation Pocket Watch (Vintage Brass)",
-    rating: 4.8,
-    reviews: 112,
-    originalPrice: null,
-    price: "$120.00",
-    discount: null,
-    tags: ["VAULT EXCLUSIVE"],
-    lowStock: true,
-    stockCount: 7,
-    image: "images/Watch.webp"
-  },
-  {
-    id: 12,
-    brand: "ZENIN OUTCAST",
-    category: "STREETWEAR",
-    title: "Heavenly Restriction Compression Top",
-    rating: 4.7,
-    reviews: 89,
-    originalPrice: "$60.00",
-    price: "$45.00",
-    discount: "-25% OFF",
-    tags: ["PERFORMANCE"],
-    lowStock: true,
-    stockCount: 5,
-    image: "images/Toji.webp"
-  }
-];
+import { products } from '../data';
 
 export function ProductArchive() {
   const navigate = useNavigate();
+  
+  const { category } = useParams(); 
+  const categoryFilter = category || 'trending';
+  
   const { addToCart } = useCart();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   
-  // UPDATED STATE: Added "tag" to handle the dropdown menu selection
   const [newProduct, setNewProduct] = useState({ 
     title: '', brand: '', category: '', price: '', image: '', originalPrice: '', discount: '', stockCount: '', tag: 'NONE' 
   });
@@ -198,26 +24,30 @@ export function ProductArchive() {
   const [inventory, setInventory] = useState(products);
 
   useEffect(() => {
-    async function loadVault() {
+    const fetchLiveVaultData = async () => {
       try {
-        const cloudData = await getProductsFromDatabase();
-        if (cloudData && cloudData.length > 0) {
-          setInventory([...cloudData, ...products]); 
+        const liveData = await getProductsFromDatabase();
+        
+        if (liveData && liveData.length > 0) {
+          // ✦ THE FIX: Combine the live database items WITH your local products ✦
+          setInventory([...liveData, ...products]); 
         }
       } catch (error) {
-        console.error("Failed to load initial data:", error);
+        console.error("Vault Transmission Error:", error);
       }
-    }
-    loadVault();
+    };
+    fetchLiveVaultData();
   }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [categoryFilter]);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     
     const parsedStock = newProduct.stockCount ? parseInt(newProduct.stockCount) : null;
     const isLowStock = parsedStock !== null && parsedStock > 0 && parsedStock <= 5;
-
-    // Format the tag as an array for Supabase (if "NONE" is selected, send an empty array)
     const productTags = newProduct.tag !== 'NONE' ? [newProduct.tag] : [];
 
     const newItem = {
@@ -233,19 +63,16 @@ export function ProductArchive() {
       reviews: Math.floor(Math.random() * 150) + 12, 
       lowStock: isLowStock,
       stockCount: parsedStock,
-      tags: productTags // NEW: Sends the selected tag to the database
+      tags: productTags 
     };
 
     try {
       await addProductToDatabase(newItem);
       setInventory([newItem, ...inventory]);
       setIsModalOpen(false);
-      
-      // Wipe the form completely clean
       setNewProduct({ 
         title: '', brand: '', category: '', price: '', image: '', originalPrice: '', discount: '', stockCount: '', tag: 'NONE' 
       });
-
     } catch (error) {
       console.error("Vault Error:", error);
       alert("Error: Could not connect to the Supabase Vault.");
@@ -253,27 +80,32 @@ export function ProductArchive() {
   };
 
   const handleAddToCart = (product) => {
-  addToCart(product); // Add the item to the global cart
-  setShowPopup(true); // Show the popup
-  
-  // Automatically hide the popup after 2.5 seconds
-  setTimeout(() => {
-    setShowPopup(false);
-  }, 2500); 
-};
+    addToCart(product); 
+    setShowPopup(true); 
+    setTimeout(() => setShowPopup(false), 2500); 
+  };
+
+  const displayedInventory = inventory.filter(product => {
+    if (!categoryFilter || categoryFilter === 'trending') return true;
+    
+    const cat = product.category.toLowerCase();
+    if (categoryFilter === 'figures') return cat.includes('replica') || cat.includes('collectible');
+    if (categoryFilter === 'accessories') return cat.includes('accessories') || cat.includes('jewelry');
+    if (categoryFilter === 'katana') return cat.includes('katana') || cat.includes('weapon');
+    if (categoryFilter === 'clothes') return cat.includes('streetwear') || cat.includes('apparel');
+    
+    return true;
+  });
 
   return (
     <>
       <section className="archive-section">
-        
-        {/* ... (Your header and product grid stay exactly the same) ... */}
-        
         <header className="archive-header">
           <div className="header-left">
             <h2 className="title">
               <span className="title-icon">✦</span> CURATED GEAR ARCHIVE
             </h2>
-            <p className="subtitle">{inventory.length} ITEMS FOUND</p> 
+            <p className="subtitle">{displayedInventory.length} ITEMS FOUND</p> 
           </div>
           
           <div className="header-controls">
@@ -284,7 +116,6 @@ export function ProductArchive() {
               </svg>
               ADD PRODUCT
             </button>
-
             <button className="control-btn" onClick={() => navigate('/metrics')}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-8h6m2 10h6"/></svg>
               METRICS / FILTERS
@@ -297,9 +128,8 @@ export function ProductArchive() {
         </header>
 
         <div className="product-grid">
-          {inventory.map(product => (
+          {displayedInventory.map(product => (
             <article key={product.id} className="card">
-              
               <div className="card-image-wrapper">
                 <div className="tags-container">
                   {product.discount && <span className="tag tag-discount">{product.discount}</span>}
@@ -315,7 +145,14 @@ export function ProductArchive() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 </button>
 
-                <img src={product.image} alt={product.title} className="card-image" loading="lazy" />
+                <img 
+                  src={product.image} 
+                  alt={product.title} 
+                  className="card-image" 
+                  loading="lazy" 
+                  onClick={() => navigate(`/product/${product.id}`)} 
+                  style={{ cursor: 'pointer' }} 
+                />
               </div>
 
               <div className="card-content">
@@ -324,7 +161,13 @@ export function ProductArchive() {
                   <span className="meta-category">{product.category}</span>
                 </div>
                 
-                <h3 className="card-title">{product.title}</h3>
+                <h3 
+                  className="card-title" 
+                  onClick={() => navigate(`/product/${product.id}`)} 
+                  style={{ cursor: 'pointer' }}
+                >
+                  {product.title}
+                </h3>
                 
                 <div className="card-rating">
                   <span className="stars">★★★★★</span>
@@ -338,22 +181,20 @@ export function ProductArchive() {
                   </div>
                   
                   <button className="buy-now" onClick={() => handleAddToCart(product)}>
-                  ADD TO CART
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                  </svg>
-                </button>
+                    ADD TO CART
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                      <line x1="3" y1="6" x2="21" y2="6"></line>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                  </button>
                 </div>
               </div>
-
             </article>
           ))}
         </div>
       </section>
 
-      {/* --- ADMIN UPLOAD MODAL --- */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -400,7 +241,6 @@ export function ProductArchive() {
                 />
               </div>
 
-              {/* NEW ROW: Feature Tag Dropdown and Image URL */}
               <div className="form-row">
                 <select 
                   value={newProduct.tag} 
@@ -413,8 +253,9 @@ export function ProductArchive() {
                   <option value="LIMITED RUN">LIMITED RUN</option>
                   <option value="VAULT EXCLUSIVE">VAULT EXCLUSIVE</option>
                 </select>
+                {/* ✦ POLISH: Added a slash to the placeholder so you remember ✦ */}
                 <input 
-                  type="text" placeholder="Image URL (e.g., images/mask.jpg)" required
+                  type="text" placeholder="Image URL (e.g., /images/mask.jpg)" required
                   value={newProduct.image} onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
                 />
               </div>
@@ -425,7 +266,6 @@ export function ProductArchive() {
         </div>
       )}
 
-      {/* ✦ THE POPUP IS NOW SAFELY INSIDE THE RETURN BLOCK ✦ */}
       {showPopup && (
         <div className="premium-cart-popup">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -434,7 +274,6 @@ export function ProductArchive() {
           GEAR SECURED IN CART
         </div>
       )}
-
     </>
   );
 }
